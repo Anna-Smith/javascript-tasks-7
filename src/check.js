@@ -1,6 +1,7 @@
 'use strict';
 
 exports.init = function () {
+    //просто комментарий для коммита :)
     Object.defineProperty(Object.prototype, 'check', {
         get: function () {
             return getExtendedProperties(this);

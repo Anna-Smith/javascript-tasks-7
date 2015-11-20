@@ -1,96 +1,94 @@
 'use strict';
 
 exports.init = function () {
-    //просто комментарий для коммита :)
+    Object.prototype.isNull = function () {
+        return false;
+    };
+
     Object.defineProperty(Object.prototype, 'check', {
         get: function () {
-            return getExtendedProperties(this);
+            return getObjectProperties(this);
+        }
+    });
+
+    Object.defineProperty(String.prototype, 'check', {
+        get: function () {
+            var _this = this;
+            return {
+                hasLength: function (length) {
+                    return _this.length === length;
+                },
+
+                hasWordsCount: function (count) {
+                    return _this.match(/[^\s]+/g).length === count;
+                }
+            };
+        }
+    });
+
+    Object.defineProperty(Function.prototype, 'check', {
+        get: function () {
+            var _this = this;
+            return {
+                hasParamsCount: function (count) {
+                    return _this.length === count;
+                }
+            };
+        }
+    });
+
+    Object.defineProperty(Array.prototype, 'check', {
+        get: function () {
+            var _this = this;
+            var properties = getObjectProperties(this);
+            properties.hasLength = function (length) {
+                return _this.length === length;
+            };
+            return properties;
         }
     });
 };
 
-function getExtendedProperties(_this) {
-    var prototype = Object.getPrototypeOf(_this);
-    function isCorrectPrototype(prototypes) {
-        return prototypes.some(function (proto) {
-            return proto === prototype;
-        });
-    }
+function getObjectProperties(_this) {
     return {
         containsKeys: function (keys) {
-            if (isCorrectPrototype([Object.prototype, Array.prototype])) {
-                var objKeys = Object.keys(_this);
-                return keys.every(function (key) {
-                    return objKeys.indexOf(key) != -1;
-                });
-            }
-            throw new TypeError('containsKeys cannot be applied to ' + _this);
+            var objKeys = Object.keys(_this);
+            return keys.every(function (key) {
+                return objKeys.indexOf(key) != -1;
+            });
         },
 
         hasKeys: function (keys) {
-            if (isCorrectPrototype([Object.prototype, Array.prototype])) {
-                var objKeys = Object.keys(_this);
-                return keys.every(function (key) {
+            var objKeys = Object.keys(_this);
+            return keys.every(function (key) {
                     return objKeys.indexOf(key) != -1;
                 }) && keys.length === objKeys.length;
-            }
-            throw new TypeError('hasKeys cannot be applied to ' + _this);
         },
 
         containsValues: function (values) {
-            if (isCorrectPrototype([Object.prototype, Array.prototype])) {
-                var objKeys = Object.keys(_this);
-                var objValues = objKeys.map(function (key) {
-                    return _this[key];
+            var objKeys = Object.keys(_this);
+            var objValues = objKeys.map(function (key) {
+                return _this[key];
+            });
+            return values.every(function (value) {
+                return objValues.some(function (objValue, index) {
+                    return objValue === value && delete objValues[index];
                 });
-                return values.every(function (value) {
-                    return objValues.some(function (objValue, index) {
-                        return objValue === value && delete objValues[index];
-                    });
-                });
-            }
-            throw new TypeError('containsValues cannot be applied to ' + _this);
+            });
         },
 
         hasValues: function (values) {
-            if (isCorrectPrototype([Object.prototype, Array.prototype])) {
-                var objKeys = Object.keys(_this);
-                return objKeys.every(function (key) {
-                    return values.indexOf(_this[key]) !== -1 && objKeys.length === values.length;
-                });
-            }
-            throw new TypeError('hasValues cannot be applied to ' + _this);
+            var objKeys = Object.keys(_this);
+            return objKeys.every(function (key) {
+                return values.indexOf(_this[key]) !== -1 && objKeys.length === values.length;
+            });
         },
 
         hasValueType: function (key, type) {
-            if (isCorrectPrototype([Object.prototype, Array.prototype])) {
-                if (_this.hasOwnProperty(key)) {
-                    return typeof _this[key] === typeof type();
-                }
-                return false;
+            if (_this.hasOwnProperty(key)) {
+                return typeof _this[key] === typeof type();
             }
-            throw new TypeError('hasValueType cannot be applied to ' + _this);
-        },
-
-        hasLength: function (length) {
-            if (isCorrectPrototype([Array.prototype, String.prototype])) {
-                return _this.length === length;
-            }
-            throw new TypeError('hasLength cannot be applied to ' + _this);
-        },
-
-        hasParamsCount: function (count) {
-            if (isCorrectPrototype([Function.prototype])) {
-                return _this.length === count;
-            }
-            throw new TypeError('hasParamsCount cannot be applied to ' + _this);
-        },
-
-        hasWordsCount: function (count) {
-            if (isCorrectPrototype([String.prototype])) {
-                return _this.split(' ').length === count;
-            }
-            throw new TypeError('hasWordsCount cannot be applied to ' + _this);
+            return false;
         }
     };
 }

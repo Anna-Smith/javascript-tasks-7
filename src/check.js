@@ -40,11 +40,12 @@ exports.init = function () {
     Object.defineProperty(Array.prototype, 'check', {
         get: function () {
             var _this = this;
-            var properties = getObjectProperties(this);
-            properties.hasLength = function (length) {
-                return _this.length === length;
-            };
-            return properties;
+
+            return Object.assign(getObjectProperties(this), {
+                hasLength: function (length) {
+                    return _this.length === length;
+                }
+            });
         }
     });
 };
@@ -54,15 +55,15 @@ function getObjectProperties(_this) {
         containsKeys: function (keys) {
             var objKeys = Object.keys(_this);
             return keys.every(function (key) {
-                return objKeys.indexOf(key) != -1;
+                return objKeys.indexOf(key) !== -1;
             });
         },
 
         hasKeys: function (keys) {
             var objKeys = Object.keys(_this);
-            return keys.every(function (key) {
-                    return objKeys.indexOf(key) != -1;
-                }) && keys.length === objKeys.length;
+            return keys.length === objKeys.length && keys.every(function (key) {
+                    return objKeys.indexOf(key) !== -1;
+                });
         },
 
         containsValues: function (values) {
@@ -79,13 +80,13 @@ function getObjectProperties(_this) {
 
         hasValues: function (values) {
             var objKeys = Object.keys(_this);
-            return objKeys.every(function (key) {
-                return values.indexOf(_this[key]) !== -1 && objKeys.length === values.length;
-            });
+            return objKeys.length === values.length && objKeys.every(function (key) {
+                    return values.indexOf(_this[key]) !== -1;
+                });
         },
 
         hasValueType: function (key, type) {
-            if (_this.hasOwnProperty(key)) {
+            if (_this.hasOwnProperty(key) && _this[key]) {
                 return typeof _this[key] === typeof type();
             }
             return false;

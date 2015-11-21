@@ -86,8 +86,8 @@ function getObjectProperties(_this) {
         },
 
         hasValueType: function (key, type) {
-            if (_this.hasOwnProperty(key) && _this[key]) {
-                return typeof _this[key] === typeof type();
+            if (_this.hasOwnProperty(key)) {
+                return {}.toString.call(_this[key]) === {}.toString.call(type());
             }
             return false;
         }
